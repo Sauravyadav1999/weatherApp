@@ -1,80 +1,78 @@
 <!doctype html>
 <html>
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Weather Web</title></head>
-        <link rel="stylesheet" href="weatherstyle.css">
-
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Web</title>
+    <link rel="stylesheet" href="weatherstyle.css">
+</head>
 <body>
 <div class="card">
     <div class="search">
-        <input type="text" placeholder="enter city name" spellcheck="false">
-    <button><img src="search.gif"></button></div>
+        <input type="text" placeholder="Enter city name" spellcheck="false">
+        <button><img src="search.gif"></button>
+    </div>
     <div class="weather">
-        <img src="weather.png"  class="weather-icon">
+        <img src="weather.png" class="weather-icon">
         <h1 class="temp">12°C</h1>
-        <h2 class="city">New Delhi </h2>
+        <h2 class="city">New Delhi</h2>
         <div class="details">
             <div class="col">
-             <img src="humidity.png" >   
-             <div>
-                <p class="humidity">50%</p>
-                <p>humidity</p>
-             </div>
+                <img src="humidity.png">   
+                <div>
+                    <p class="humidity">50%</p>
+                    <p>Humidity</p>
+                </div>
             </div>
             <div class="col">
-                <img src="wind.png" >   
+                <img src="wind.png">   
                 <div>
-                   <p class="wind">50kmph</p>
-                   <p>wind speed</p>
+                    <p class="wind">50 km/h</p>
+                    <p>Wind Speed</p>
                 </div>
-               </div>
+            </div>
         </div>
     </div>
 </div>
-<script>
 
+<script>
     const apiKey = "8c3527d93184f1dcd04b161dabf482a8";
-    const apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=Berlin&appid=8c3527d93184f1dcd04b161dabf482a8&unit=metric";
-     
     const searchBox = document.querySelector(".search input");
     const searchButton = document.querySelector(".search button");
-     
-   
-        async function checkWeather(city){
-        const response = await fetch(apiUrl + city + `&appid=$(apiKey)`);
-        var data = await response.json();
+    const weatherIcon = document.querySelector(".weather-icon");
 
+    async function checkWeather(city) {
+        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+        const response = await fetch(apiUrl);
+        const data = await response.json();
         console.log(data);
-        
-         document.querySelector(".city").innerHTML = data.name;
-         document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "°C";
-         document.querySelector(".humidity").innerHTML = data.main.humidity + "%";
-         document.querySelector(".wind").innerHTML = data.main.speed + "km/h"; 
 
-        
-         if (data.weather[0].main == "clouds"){
-            weatherIcon.src = "cloud.png";
-         }
-          else if (data.weather[0].main == "clear"){
-            weatherIcon.src = "cloudic.png";
-         } 
-         else if (data.weather[0].main == "Rain"){
-            weatherIcon.src = "cloudic.png";
-         }
-         else if (data.weather[0].main == "Drizzle"){
-            weatherIcon.src = "cloud.png";
+        if (data.cod === "404") {
+            alert("City not found");
+            return;
         }
-        
+
+        document.querySelector(".city").innerHTML = data.name;
+        document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "°C";
+        document.querySelector(".humidity").innerHTML = data.main.humidity + "%";
+        document.querySelector(".wind").innerHTML = data.wind.speed + " km/h";
+
+        const weatherMain = data.weather[0].main.toLowerCase();
+        if (weatherMain === "clouds") {
+            weatherIcon.src = "cloud.png";
+        } else if (weatherMain === "clear") {
+            weatherIcon.src = "cloudic.png";
+        } else if (weatherMain === "rain" || weatherMain === "drizzle") {
+            weatherIcon.src = "cloudic.png";
+        } else {
+            weatherIcon.src = "weather.png";
+        }
     }
 
-
-    searchButton.addEventListener("click", ()=> {
-                                 checkWeather(searchBox.value);
-
-    })
-   
-    </Script>
+    searchButton.addEventListener("click", () => {
+        checkWeather(searchBox.value.trim());
+    });
+</script>
 
 </body>
- </html>
+</html>
